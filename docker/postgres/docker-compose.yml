@@ -1,0 +1,52 @@
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: empleadosdb
+      POSTGRES_USER: empleado_user
+      POSTGRES_PASSWORD: empleado_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U empleado_user -d empleadosdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  empleado-service:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    image: empleado-service:dev
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: empleadosdb
+      DB_USER: empleado_user
+      DB_PASSWORD: empleado_pass
+      BASIC_AUTH_USER: admin
+      BASIC_AUTH_PASSWORD: admin123
+      SPRING_PROFILES_ACTIVE: dev
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build:
+      context: ../..
+      dockerfile: frontend/Dockerfile
+    image: empleado-frontend:dev
+    restart: unless-stopped
+    depends_on:
+      - empleado-service
+    ports:
+      - "4200:80"
+
+volumes:
+  postgres_data:

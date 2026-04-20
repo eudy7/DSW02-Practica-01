@@ -1,0 +1,63 @@
+services:
+  proxy:
+    image: nginx:1.27-alpine
+    container_name: proxy
+    restart: unless-stopped
+    depends_on:
+      - front
+      - backend
+    ports:
+      - "80:80"
+    volumes:
+      - ./docker/proxy/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: empleado-service:dev
+    container_name: backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: empleadosdb
+      DB_USER: empleado_user
+      DB_PASSWORD: empleado_pass
+      BASIC_AUTH_USER: admin
+      BASIC_AUTH_PASSWORD: admin123
+      SPRING_PROFILES_ACTIVE: dev
+
+  front:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    image: empleado-frontend:dev
+    container_name: front
+    restart: unless-stopped
+    depends_on:
+      - backend
+
+  db:
+    image: postgres:16
+    container_name: db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: empleadosdb
+      POSTGRES_USER: empleado_user
+      POSTGRES_PASSWORD: empleado_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U empleado_user -d empleadosdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

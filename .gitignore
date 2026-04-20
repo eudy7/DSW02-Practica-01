@@ -1,0 +1,27 @@
+target/
+build/
+.gradle/
+*.class
+*.jar
+*.war
+*.ear
+node_modules/
+dist/
+
+# IDE and editors
+.idea/
+.vscode/
+*.iml
+
+# OS / temp
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+
+# Logs and env
+*.log
+.env*
+
+# Maven wrapper cache
+.mvn/wrapper/maven-wrapper.jar

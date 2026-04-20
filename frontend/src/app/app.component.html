@@ -1,0 +1,346 @@
+<main class="layout">
+  <section class="card">
+    <ng-container *ngIf="!token; else crudView">
+      <section class="login-shell">
+        <div class="login-panel login-panel-info">
+          <p class="login-kicker">Portal Administrativo</p>
+          <h1>Frontend Empleados</h1>
+          <p class="login-text">
+            Accede con tus credenciales para consultar y gestionar la informacion de empleados y departamentos.
+          </p>
+          <ul class="login-notes">
+            <li>Usuario ADMIN: acceso completo a CRUD y asignaciones.</li>
+            <li>Usuario EMPLEADO: acceso de lectura a listados.</li>
+            <li>Las operaciones se registran y validan por sesion activa.</li>
+          </ul>
+        </div>
+
+        <div class="login-panel login-panel-form">
+          <h2>Iniciar sesion</h2>
+          <p class="login-text">Usa tu correo como usuario y tu contrasena institucional.</p>
+
+          <form (ngSubmit)="iniciarSesion()" #loginForm="ngForm" class="login-form">
+            <label>
+              Correo
+              <input type="text" name="correo" [(ngModel)]="correo" autocomplete="username" required />
+            </label>
+
+            <label>
+              Contrasena
+              <div class="password-row">
+                <input
+                  #passwordInput
+                  type="password"
+                  name="contrasena"
+                  [(ngModel)]="contrasena"
+                  autocomplete="current-password"
+                  required
+                />
+                <button
+                  type="button"
+                  class="btn-sec password-toggle"
+                  (click)="passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password'"
+                >
+                  {{ passwordInput.type === 'password' ? 'Ver' : 'Ocultar' }}
+                </button>
+              </div>
+            </label>
+
+            <button type="submit" [disabled]="loginForm.invalid">Entrar al sistema</button>
+          </form>
+
+          <p class="estado login-state">{{ estado }}</p>
+        </div>
+      </section>
+    </ng-container>
+
+    <ng-template #crudView>
+      <div class="crud-header">
+        <h1>CRUD Empleados</h1>
+        <button type="button" class="btn-sec" (click)="cerrarSesion()">Cerrar sesion</button>
+      </div>
+
+      <p class="estado">Rol: {{ rolUsuario || 'N/A' }}</p>
+
+      <p class="estado">{{ crudEstado }}</p>
+
+      <ng-container *ngIf="esAdmin; else noAdminNotice">
+        <p class="estado">{{ deptoEstado }}</p>
+
+        <div class="admin-grid">
+          <section class="panel formal control-panel">
+            <details class="accordion" open>
+              <summary>CRUD Empleados</summary>
+              <form (ngSubmit)="crearEmpleado()" #createForm="ngForm" class="grid-form">
+                <label>
+                  Nombre
+                  <input type="text" name="nuevoNombre" [(ngModel)]="nuevoNombre" required />
+                </label>
+                <label>
+                  Direccion
+                  <input type="text" name="nuevaDireccion" [(ngModel)]="nuevaDireccion" required />
+                </label>
+                <label>
+                  Telefono
+                  <input type="text" name="nuevoTelefono" [(ngModel)]="nuevoTelefono" required />
+                </label>
+                <button type="submit" [disabled]="createForm.invalid || creando">Guardar empleado</button>
+              </form>
+
+              <details class="accordion nested-accordion" *ngIf="editClave" open>
+                <summary>Editar {{ editClave }}</summary>
+                <form (ngSubmit)="guardarEdicion()" #editForm="ngForm" class="grid-form">
+                  <label>
+                    Nombre
+                    <input type="text" name="editNombre" [(ngModel)]="editNombre" required />
+                  </label>
+                  <label>
+                    Direccion
+                    <input type="text" name="editDireccion" [(ngModel)]="editDireccion" required />
+                  </label>
+                  <label>
+                    Telefono
+                    <input type="text" name="editTelefono" [(ngModel)]="editTelefono" required />
+                  </label>
+                  <div class="actions">
+                    <button type="submit" [disabled]="editForm.invalid">Actualizar</button>
+                    <button type="button" class="btn-sec" (click)="cancelarEdicion()">Cancelar</button>
+                  </div>
+                </form>
+              </details>
+            </details>
+          </section>
+
+          <section class="panel formal list-panel">
+            <div class="crud-header">
+              <h2>Listado de Empleados</h2>
+              <button type="button" class="btn-sec" (click)="cargarEmpleados()">Refrescar</button>
+            </div>
+
+            <table *ngIf="empleados.length > 0; else emptyState">
+              <thead>
+                <tr>
+                  <th>Clave</th>
+                  <th>Nombre</th>
+                  <th>Direccion</th>
+                  <th>Telefono</th>
+                  <th>Departamento destino</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let e of empleados">
+                  <td>{{ e.clave }}</td>
+                  <td>{{ e.nombre }}</td>
+                  <td>{{ e.direccion }}</td>
+                  <td>{{ e.telefono }}</td>
+                  <td>
+                    <select
+                      [(ngModel)]="destinoDepartamentoPorEmpleado[e.clave]"
+                      [ngModelOptions]="{ standalone: true }"
+                    >
+                      <option value="">Seleccionar</option>
+                      <option *ngFor="let d of departamentos" [value]="d.id" [disabled]="!d.activo">
+                        {{ d.nombre }}
+                      </option>
+                    </select>
+                  </td>
+                  <td class="actions">
+                    <button type="button" (click)="seleccionarEdicion(e)">Editar</button>
+                    <button type="button" class="btn-sec" (click)="eliminarEmpleado(e.clave)">Eliminar</button>
+                    <button type="button" (click)="asignarDepartamentoEmpleado(e.clave)">Asignar depto</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <ng-template #emptyState>
+              <p>No hay empleados registrados.</p>
+            </ng-template>
+          </section>
+
+          <section class="panel formal control-panel">
+            <details class="accordion" open>
+              <summary>CRUD Departamentos</summary>
+              <div class="actions top-inline-actions">
+                <label class="inline-check">
+                  <input
+                    type="checkbox"
+                    name="includeInactiveDepartamentos"
+                    [(ngModel)]="includeInactiveDepartamentos"
+                    (change)="cargarDepartamentos()"
+                  />
+                  Mostrar inactivos
+                </label>
+              </div>
+
+              <form (ngSubmit)="crearDepartamento()" #createDeptForm="ngForm" class="grid-form">
+                <label>
+                  Nombre
+                  <input
+                    type="text"
+                    name="nuevoDepartamentoNombre"
+                    [(ngModel)]="nuevoDepartamentoNombre"
+                    required
+                  />
+                </label>
+                <label>
+                  Descripcion
+                  <input
+                    type="text"
+                    name="nuevoDepartamentoDescripcion"
+                    [(ngModel)]="nuevoDepartamentoDescripcion"
+                  />
+                </label>
+                <button type="submit" [disabled]="createDeptForm.invalid || creandoDepto">Guardar departamento</button>
+              </form>
+
+              <details class="accordion nested-accordion" *ngIf="editDepartamentoId !== null" open>
+                <summary>Editar departamento #{{ editDepartamentoId }}</summary>
+                <form (ngSubmit)="guardarEdicionDepartamento()" #editDeptForm="ngForm" class="grid-form">
+                  <label>
+                    Nombre
+                    <input
+                      type="text"
+                      name="editDepartamentoNombre"
+                      [(ngModel)]="editDepartamentoNombre"
+                      required
+                    />
+                  </label>
+                  <label>
+                    Descripcion
+                    <input
+                      type="text"
+                      name="editDepartamentoDescripcion"
+                      [(ngModel)]="editDepartamentoDescripcion"
+                    />
+                  </label>
+                  <div class="actions">
+                    <button type="submit" [disabled]="editDeptForm.invalid">Actualizar</button>
+                    <button type="button" class="btn-sec" (click)="cancelarEdicionDepartamento()">Cancelar</button>
+                  </div>
+                </form>
+              </details>
+            </details>
+          </section>
+
+          <section class="panel formal list-panel">
+            <div class="crud-header">
+              <h2>Listado de Departamentos</h2>
+              <button type="button" class="btn-sec" (click)="cargarDepartamentos()">Refrescar</button>
+            </div>
+
+            <table *ngIf="departamentos.length > 0; else emptyDeptState">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nombre</th>
+                  <th>Descripcion</th>
+                  <th>Activo</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let d of departamentos">
+                  <td>{{ d.id }}</td>
+                  <td>{{ d.nombre }}</td>
+                  <td>{{ d.descripcion || '-' }}</td>
+                  <td>{{ d.activo ? 'Si' : 'No' }}</td>
+                  <td class="actions">
+                    <button type="button" (click)="seleccionarEdicionDepartamento(d)">Editar</button>
+                    <button
+                      type="button"
+                      [disabled]="d.activo"
+                      (click)="activarDepartamento(d.id)"
+                    >
+                      Activar
+                    </button>
+                    <button
+                      type="button"
+                      class="btn-sec"
+                      [disabled]="!d.activo"
+                      (click)="inactivarDepartamento(d.id)"
+                    >
+                      Inactivar
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <ng-template #emptyDeptState>
+              <p>No hay departamentos para mostrar.</p>
+            </ng-template>
+          </section>
+        </div>
+      </ng-container>
+
+      <ng-template #noAdminNotice>
+        <section class="panel">
+          <div class="crud-header">
+            <h2>Empleados</h2>
+            <button type="button" class="btn-sec" (click)="cargarEmpleados()">Refrescar</button>
+          </div>
+
+          <table *ngIf="empleados.length > 0; else emptyStateReadOnly">
+            <thead>
+              <tr>
+                <th>Clave</th>
+                <th>Nombre</th>
+                <th>Direccion</th>
+                <th>Telefono</th>
+                <th>Departamento</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let e of empleados">
+                <td>{{ e.clave }}</td>
+                <td>{{ e.nombre }}</td>
+                <td>{{ e.direccion }}</td>
+                <td>{{ e.telefono }}</td>
+                <td>{{ nombreDepartamentoDeEmpleado(e.clave) }}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <ng-template #emptyStateReadOnly>
+            <p>No hay empleados registrados.</p>
+          </ng-template>
+        </section>
+
+        <section class="panel">
+          <div class="crud-header">
+            <h2>Departamentos</h2>
+            <button type="button" class="btn-sec" (click)="cargarDepartamentos()">Refrescar</button>
+          </div>
+
+          <p class="estado">Lista de departamentos existentes (solo lectura).</p>
+
+          <table *ngIf="departamentos.length > 0; else emptyDeptStateReadOnly">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Descripcion</th>
+                <th>Activo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let d of departamentos">
+                <td>{{ d.id }}</td>
+                <td>{{ d.nombre }}</td>
+                <td>{{ d.descripcion || '-' }}</td>
+                <td>{{ d.activo ? 'Si' : 'No' }}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <ng-template #emptyDeptStateReadOnly>
+            <p>No hay departamentos para mostrar.</p>
+          </ng-template>
+        </section>
+      </ng-template>
+    </ng-template>
+
+  </section>
+</main>

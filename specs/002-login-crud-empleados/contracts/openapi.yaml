@@ -1,0 +1,317 @@
+openapi: 3.0.3
+info:
+  title: API de Empleados con Login
+  version: 2.0.0
+  description: Contrato para autenticacion por sesion y CRUD de empleados protegido.
+servers:
+  - url: http://localhost:8080
+security:
+  - bearerAuth: []
+paths:
+  /auth/login:
+    post:
+      summary: Iniciar sesion
+      operationId: iniciarSesion
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login exitoso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '423':
+          $ref: '#/components/responses/AccountLocked'
+
+  /auth/logout:
+    post:
+      summary: Cerrar sesion activa
+      operationId: cerrarSesion
+      responses:
+        '204':
+          description: Logout exitoso
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/config:
+    get:
+      summary: Consultar configuracion de acceso global
+      operationId: obtenerConfiguracionAcceso
+      responses:
+        '200':
+          description: Configuracion actual de autenticacion
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthConfigResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/empleados:
+    get:
+      summary: Listar empleados
+      operationId: listarEmpleados
+      responses:
+        '200':
+          description: Lista de empleados
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EmpleadoResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      summary: Crear empleado
+      operationId: crearEmpleado
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmpleadoRequest'
+      responses:
+        '201':
+          description: Empleado creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmpleadoResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /api/empleados/{clave}:
+    parameters:
+      - name: clave
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: '^EMP-[0-9]+$'
+
+    get:
+      summary: Consultar empleado por clave
+      operationId: obtenerEmpleado
+      responses:
+        '200':
+          description: Empleado encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmpleadoResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      summary: Actualizar empleado
+      operationId: actualizarEmpleado
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmpleadoUpdateRequest'
+      responses:
+        '200':
+          description: Empleado actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmpleadoResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      summary: Eliminar empleado
+      operationId: eliminarEmpleado
+      responses:
+        '204':
+          description: Empleado eliminado
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: token
+
+  schemas:
+    LoginRequest:
+      type: object
+      required: [usuario, contrasena]
+      properties:
+        usuario:
+          type: string
+          minLength: 1
+          maxLength: 100
+        contrasena:
+          type: string
+          minLength: 1
+          maxLength: 100
+
+    LoginResponse:
+      type: object
+      required: [token, tokenType, expiresInSeconds, usuario]
+      properties:
+        token:
+          type: string
+          minLength: 32
+          description: Token opaco de sesion.
+        tokenType:
+          type: string
+          example: Bearer
+        expiresInSeconds:
+          type: integer
+          minimum: 1
+        usuario:
+          type: string
+
+    AuthConfigResponse:
+      type: object
+      required: [usuario, sessionTimeoutMinutes, maxFailedAttempts, failedAttemptWindowMinutes, lockMinutes]
+      properties:
+        usuario:
+          type: string
+        sessionTimeoutMinutes:
+          type: integer
+          minimum: 1
+        maxFailedAttempts:
+          type: integer
+          minimum: 1
+        failedAttemptWindowMinutes:
+          type: integer
+          minimum: 1
+        lockMinutes:
+          type: integer
+          minimum: 1
+
+    EmpleadoRequest:
+      type: object
+      required: [nombre, direccion, telefono]
+      properties:
+        nombre:
+          type: string
+          minLength: 1
+          maxLength: 100
+        direccion:
+          type: string
+          minLength: 1
+          maxLength: 100
+        telefono:
+          type: string
+          minLength: 1
+          maxLength: 100
+
+    EmpleadoUpdateRequest:
+      type: object
+      required: [nombre, direccion, telefono]
+      properties:
+        nombre:
+          type: string
+          minLength: 1
+          maxLength: 100
+        direccion:
+          type: string
+          minLength: 1
+          maxLength: 100
+        telefono:
+          type: string
+          minLength: 1
+          maxLength: 100
+
+    EmpleadoResponse:
+      type: object
+      required: [clave, clavePrefijo, claveNumero, nombre, direccion, telefono]
+      properties:
+        clave:
+          type: string
+          pattern: '^EMP-[0-9]+$'
+        clavePrefijo:
+          type: string
+          enum: [EMP]
+        claveNumero:
+          type: integer
+          minimum: 1
+        nombre:
+          type: string
+          maxLength: 100
+        direccion:
+          type: string
+          maxLength: 100
+        telefono:
+          type: string
+          maxLength: 100
+
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: array
+          items:
+            type: string
+
+  responses:
+    BadRequest:
+      description: Solicitud invalida
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    Unauthorized:
+      description: Credenciales invalidas o sesion no valida
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    AccountLocked:
+      description: Cuenta temporalmente bloqueada por intentos fallidos
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    Conflict:
+      description: Conflicto de datos
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    NotFound:
+      description: Recurso no encontrado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'

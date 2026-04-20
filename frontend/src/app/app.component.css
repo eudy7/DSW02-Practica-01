@@ -1,0 +1,322 @@
+:host {
+  display: block;
+  min-height: 100dvh;
+  font-family: "Lora", "Cambria", "Times New Roman", serif;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(30, 64, 175, 0.1), transparent 40%),
+    radial-gradient(circle at 85% 10%, rgba(15, 118, 110, 0.1), transparent 35%),
+    linear-gradient(135deg, #edf2f7 0%, #f8fafc 100%);
+  color: #0f172a;
+}
+
+.layout {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+}
+
+.card {
+  width: 100%;
+  max-width: 86rem;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid #cbd5e1;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12);
+}
+
+.login-shell {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 1.2rem;
+}
+
+.login-panel {
+  border: 1px solid #d5dde7;
+  border-radius: 0.9rem;
+  padding: 1.2rem;
+  background: #ffffff;
+}
+
+.login-panel-info {
+  background:
+    linear-gradient(180deg, rgba(30, 64, 175, 0.08) 0%, rgba(15, 118, 110, 0.05) 100%),
+    #ffffff;
+}
+
+.login-panel-form {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+}
+
+.login-kicker {
+  margin: 0 0 0.4rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #334155;
+  font-family: "Source Sans 3", "Trebuchet MS", sans-serif;
+  font-weight: 700;
+}
+
+.login-text {
+  margin-bottom: 0.9rem;
+  color: #334155;
+}
+
+.login-notes {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 0.45rem;
+  color: #1e293b;
+  font-family: "Source Sans 3", "Trebuchet MS", sans-serif;
+}
+
+.login-form {
+  gap: 0.95rem;
+}
+
+.password-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.55rem;
+  align-items: center;
+}
+
+.password-toggle {
+  margin-top: 0;
+  padding: 0.62rem 0.85rem;
+  min-width: 5.2rem;
+}
+
+.login-state {
+  margin-top: 0.95rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #d5dde7;
+  border-radius: 0.65rem;
+  background: #f8fafc;
+}
+
+h1 {
+  margin: 0 0 0.5rem;
+  letter-spacing: 0.02em;
+}
+
+p {
+  margin: 0 0 1rem;
+}
+
+h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.08rem;
+}
+
+h3 {
+  margin: 0.9rem 0 0.7rem;
+  font-size: 1rem;
+}
+
+form {
+  display: grid;
+  gap: 0.85rem;
+}
+
+label {
+  display: grid;
+  gap: 0.4rem;
+  font-size: 0.95rem;
+}
+
+input {
+  border: 1px solid #d1d5db;
+  border-radius: 0.6rem;
+  padding: 0.65rem 0.75rem;
+  font-size: 0.98rem;
+  font-family: "Source Sans 3", "Trebuchet MS", sans-serif;
+}
+
+select {
+  border: 1px solid #d1d5db;
+  border-radius: 0.6rem;
+  padding: 0.45rem 0.55rem;
+  font-size: 0.92rem;
+  background: #fff;
+  font-family: "Source Sans 3", "Trebuchet MS", sans-serif;
+}
+
+button {
+  margin-top: 0.2rem;
+  border: none;
+  border-radius: 0.65rem;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(135deg, #0f766e 0%, #0b5f5a 100%);
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-sec {
+  background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+}
+
+.crud-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.panel {
+  margin-top: 1rem;
+  border: 1px solid #d6dee8;
+  border-radius: 0.8rem;
+  padding: 1rem;
+  background: #f8fafc;
+}
+
+.formal {
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+  border-color: #cfd8e3;
+}
+
+.admin-grid {
+  margin-top: 1rem;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(20rem, 28rem) 1fr;
+}
+
+.control-panel,
+.list-panel {
+  min-height: 16rem;
+}
+
+.accordion {
+  border: 1px solid #d6dee8;
+  border-radius: 0.7rem;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.accordion + .accordion {
+  margin-top: 0.8rem;
+}
+
+.accordion > summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 0.8rem 0.95rem;
+  font-size: 0.98rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, #e2e8f0 0%, #f8fafc 100%);
+  border-bottom: 1px solid #d6dee8;
+}
+
+.accordion > summary::-webkit-details-marker {
+  display: none;
+}
+
+.accordion > form,
+.accordion > .actions,
+.accordion > .nested-accordion {
+  margin: 0.9rem;
+}
+
+.nested-accordion > summary {
+  background: #f8fafc;
+}
+
+.top-inline-actions {
+  margin-bottom: 0;
+}
+
+.panel.nested {
+  margin-top: 0.8rem;
+  background: #eef2ff;
+}
+
+.grid-form {
+  display: grid;
+  gap: 0.8rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  text-align: left;
+  border-bottom: 1px solid #d8e0ea;
+  padding: 0.55rem;
+  font-size: 0.95rem;
+  font-family: "Source Sans 3", "Trebuchet MS", sans-serif;
+}
+
+thead th {
+  background: #e2e8f0;
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.inline-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.9rem;
+}
+
+.inline-check input {
+  width: 1rem;
+  height: 1rem;
+}
+
+.estado {
+  margin-top: 1rem;
+  font-weight: 600;
+}
+
+.token {
+  margin-top: 0.8rem;
+  background: #f3f4f6;
+  border-radius: 0.5rem;
+  padding: 0.8rem;
+}
+
+.warning {
+  margin: 0;
+  color: #7c2d12;
+  background: #ffedd5;
+  border: 1px solid #fed7aa;
+  border-radius: 0.5rem;
+  padding: 0.7rem;
+}
+
+code {
+  display: block;
+  margin-top: 0.3rem;
+  word-break: break-all;
+}
+
+@media (max-width: 1100px) {
+  .admin-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .login-shell {
+    grid-template-columns: 1fr;
+  }
+}

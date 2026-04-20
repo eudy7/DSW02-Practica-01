@@ -1,0 +1,36 @@
+spring:
+  profiles:
+    default: dev
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:empleadosdb}
+    username: ${DB_USER:empleado_user}
+    password: ${DB_PASSWORD:empleado_pass}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui/index.html
+
+auth:
+  session-timeout-minutes: ${AUTH_SESSION_TIMEOUT_MINUTES:30}
+  max-failed-attempts: ${AUTH_MAX_FAILED_ATTEMPTS:5}
+  failed-attempt-window-minutes: ${AUTH_FAILED_ATTEMPT_WINDOW_MINUTES:15}
+  lock-minutes: ${AUTH_LOCK_MINUTES:15}
+  credential:
+    username: ${BASIC_AUTH_USER:admin}
+    password: ${BASIC_AUTH_PASSWORD:admin123}
